@@ -20,76 +20,28 @@ int find_pnum(int initial_addr, int last_addr);
 
 void show_msg(void);
 
-int main(void) {
+int main(int argc, char *argv[argc + 1]) {
   int pnum_total = 0;
   clock_t initial_time;
   double total_time;
 
-  while (1) {
-    int option = 0;
-    int matrix_order[2];
+  int matrix_order[2];
 
-    show_msg();
+  matrix_order[0] = atoi(argv[1]);
+  matrix_order[1] = atoi(argv[2]);
 
-    printf("Informe uma opção: ");
-    scanf("%d", &option);
+  alloc_matrix(matrix_order[0], matrix_order[1]);
+  fill_matrix(matrix_order[0], matrix_order[1]);
 
-    switch (option) {
-    case 1:
-      printf("Informe a ordem da matrix (NxM): \n");
+  initial_time = clock();
 
-      printf("Linhas: ");
-      scanf("%d", &matrix_order[0]);
+  pnum_total += find_pnum(matrix_order[0], matrix_order[1]);
 
-      printf("Colunas: ");
-      scanf("%d", &matrix_order[1]);
+  initial_time = clock() - initial_time;
+  total_time = (double)initial_time / CLOCKS_PER_SEC;
 
-      if (alloc_matrix(matrix_order[0], matrix_order[1]) == 0) {
-        printf("\nMatriz %dx%d alocada com sucesso!\n", matrix_order[0],
-               matrix_order[1]);
-      }
-
-      break;
-
-    case 2:
-      printf("Preenchendo a matriz!\n (Aguarde...)\n");
-
-      if (fill_matrix(matrix_order[0], matrix_order[1]) == 0) {
-        puts("Matriz preenchida!");
-      }
-
-      break;
-
-    case 3:
-      puts("[Não implementado]");
-
-      break;
-
-    case 4:
-      initial_time = clock();
-
-      pnum_total = find_pnum(matrix_order[0], matrix_order[1]);
-
-      initial_time = clock() - initial_time;
-      total_time = (double)initial_time / CLOCKS_PER_SEC;
-
-      break;
-
-    case 5:
-      printf("\nTempo de Execução: %.4f segundos\n", total_time);
-      printf("Total de Número Primos: %d\n\n", pnum_total);
-
-      break;
-
-    case 6:
-      puts("Encerrando o programa");
-      return 0;
-
-    default:
-      puts("Opção inexistente!");
-      exit(-1);
-    }
-  }
+  printf("%5d x %5d - %8d - %10.4f\n", matrix_order[0], matrix_order[1],
+         pnum_total, total_time);
 
   free(matrix);
 
@@ -193,8 +145,10 @@ int find_pnum(int initial_addr, int last_addr) {
         n_div++;
     }
 
-    if (n_div == 2)
+    if (n_div == 2) {
+      // printf("(%d) [%d]\n", i, (*matrix)[i]);
       pnum_found++;
+    }
   }
 
   return pnum_found;
