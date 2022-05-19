@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 #define MAX_SIZE 99999999
 int **matrix;
@@ -20,10 +21,14 @@ int find_pnum(int initial_addr, int last_addr);
 void show_msg(void);
 
 int main(void) {
+  int pnum_total = 0;
 
   while (1) {
     int option = 0;
     int matrix_order[2];
+
+    clock_t initial_time;
+    double total_time;
 
     show_msg();
 
@@ -62,10 +67,17 @@ int main(void) {
       break;
 
     case 4:
-      int pnum_total = 0;
+      initial_time = clock();
 
       pnum_total = find_pnum(matrix_order[0], matrix_order[1]);
-      printf("Total de Números Primos: %5d\n", pnum_total);
+
+      total_time = (double)initial_time / CLOCKS_PER_SEC;
+
+      break;
+
+    case 5:
+      printf("Tempo de Execução: %.4f segunds\n", total_time);
+      printf("Total de Número Primos: %d\n", pnum_total);
 
       break;
 
@@ -151,10 +163,12 @@ void show_msg(void) {
   char *msg_2 = "2 - Preencher matriz";
 
   char *msg_4 = "4 - Executar";
+  char *msg_5 = "5 - Tempo de Execução e Total de Números Primos";
 
   printf("%s\n", msg_1);
   printf("%s\n", msg_2);
   printf("%s\n", msg_4);
+  printf("%s\n", msg_5);
 }
 
 int find_pnum(int initial_addr, int last_addr) {
@@ -173,10 +187,8 @@ int find_pnum(int initial_addr, int last_addr) {
         n_div++;
     }
 
-    if (n_div == 2) {
-      printf("(%10d) [%8d]\n", i, (*matrix)[i]);
+    if (n_div == 2)
       pnum_found++;
-    }
   }
 
   return pnum_found;
