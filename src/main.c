@@ -139,14 +139,19 @@ int find_pnum(int initial_addr, int last_addr) {
 
   for (int i = initial_addr; i < (initial_addr * last_addr); i++) {
     int n_div = 0;
-    //
+
+    if ((*matrix)[i] % 2 == 0) {
+      continue;
+    }
+
     for (int j = 1; j <= (*matrix)[i]; j += 2) {
 
-      if ((*matrix)[i] % 2 == 0 || n_div > 2)
-        break;
-
-      if ((*matrix)[i] % j == 0)
+      if ((*matrix)[i] % j == 0) {
         n_div++;
+
+        if (n_div > 2)
+          break;
+      }
     }
 
     if (n_div == 2) {
