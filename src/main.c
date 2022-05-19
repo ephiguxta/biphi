@@ -22,13 +22,12 @@ void show_msg(void);
 
 int main(void) {
   int pnum_total = 0;
+  clock_t initial_time;
+  double total_time;
 
   while (1) {
     int option = 0;
     int matrix_order[2];
-
-    clock_t initial_time;
-    double total_time;
 
     show_msg();
 
@@ -71,15 +70,20 @@ int main(void) {
 
       pnum_total = find_pnum(matrix_order[0], matrix_order[1]);
 
+      initial_time = clock() - initial_time;
       total_time = (double)initial_time / CLOCKS_PER_SEC;
 
       break;
 
     case 5:
-      printf("Tempo de Execução: %.4f segunds\n", total_time);
-      printf("Total de Número Primos: %d\n", pnum_total);
+      printf("\nTempo de Execução: %.4f segundos\n", total_time);
+      printf("Total de Número Primos: %d\n\n", pnum_total);
 
       break;
+
+    case 6:
+      puts("Encerrando o programa");
+      return 0;
 
     default:
       puts("Opção inexistente!");
@@ -164,11 +168,13 @@ void show_msg(void) {
 
   char *msg_4 = "4 - Executar";
   char *msg_5 = "5 - Tempo de Execução e Total de Números Primos";
+  char *msg_6 = "6 - Encerrar";
 
   printf("%s\n", msg_1);
   printf("%s\n", msg_2);
   printf("%s\n", msg_4);
   printf("%s\n", msg_5);
+  printf("%s\n", msg_6);
 }
 
 int find_pnum(int initial_addr, int last_addr) {
