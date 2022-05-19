@@ -27,7 +27,7 @@ int main(int argc, char *argv[argc + 1]) {
 
   int matrix_order[2];
 
-  if(argc != 2) {
+  if (argc != 2) {
     puts("Para fins de teste, informe a ordem da matriz");
     return -1;
   }
@@ -40,7 +40,7 @@ int main(int argc, char *argv[argc + 1]) {
 
   initial_time = clock();
 
-  pnum_total += find_pnum(matrix_order[0], matrix_order[1]);
+  pnum_total = find_pnum(matrix_order[0], matrix_order[1]);
 
   initial_time = clock() - initial_time;
   total_time = (double)initial_time / CLOCKS_PER_SEC;
@@ -118,35 +118,21 @@ int fill_matrix(int rows, int cols) {
   return 0;
 }
 
-void show_msg(void) {
-  char *msg_1 = "1 - Alocar matriz";
-  char *msg_2 = "2 - Preencher matriz";
-
-  char *msg_4 = "4 - Executar";
-  char *msg_5 = "5 - Tempo de Execução e Total de Números Primos";
-  char *msg_6 = "6 - Encerrar";
-
-  printf("%s\n", msg_1);
-  printf("%s\n", msg_2);
-  printf("%s\n", msg_4);
-  printf("%s\n", msg_5);
-  printf("%s\n", msg_6);
-}
-
 int find_pnum(int initial_addr, int last_addr) {
   // total de números primos encontrados
   int pnum_found = 0;
 
-  for (int i = initial_addr; i < (initial_addr * last_addr); i++) {
+  for (int i = 0; i < (last_addr * initial_addr); i++) {
     int n_div = 0;
 
-    if ((*matrix)[i] % 2 == 0) {
+    if ((*matrix)[i] % 2 == 0)
       continue;
-    }
 
     for (int j = 1; j <= (*matrix)[i]; j += 2) {
 
-      if ((*matrix)[i] % j == 0) {
+      int result = (*matrix)[i] % j;
+
+      if (result == 0) {
         n_div++;
 
         if (n_div > 2)
