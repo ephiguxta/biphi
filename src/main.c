@@ -45,6 +45,15 @@ int main(void) {
 
       break;
 
+    case 2:
+      printf("Preenchendo a matriz!\n (Aguarde...)\n");
+
+      if (fill_matrix(matrix_order[0], matrix_order[1]) == 0) {
+        puts("Matriz preenchida!");
+      }
+
+      break;
+
     default:
       puts("Opção inexistente!");
       exit(-1);
@@ -124,6 +133,8 @@ int fill_matrix(int rows, int cols) {
 
 void show_msg(void) {
   char *msg_1 = "1 - Alocar matriz";
+  char *msg_2 = "2 - Preencher matriz";
 
   printf("%s\n", msg_1);
+  printf("%s\n", msg_2);
 }
