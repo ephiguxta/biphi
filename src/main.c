@@ -8,6 +8,7 @@
 
 int **matrix;
 
+// controlando o acesso das threads a variável global
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 int total_prime_n = 0;
 
@@ -28,8 +29,8 @@ struct pair_addr {
 };
 // essa função será responsável por achar
 // os números primos, a estrutura acima serve
-// de base para separa os endereços das submatrizes
-// entre as threads
+// de base para separar os endereços das submatrizes
+// para as threads
 void *find_pnum(void *data);
 
 struct parse_data {
@@ -38,7 +39,7 @@ struct parse_data {
   char n_times;
 };
 // pega o número inteiro que pode dividir a matriz corretamente,
-// também o número restante, caso a matriz não for de ordem para,
+// também o número restante, caso a matriz não for de ordem par 
 // esse dado restante será usado para a última thread operar sobre.
 struct parse_data slice_matrix(int rows, int cols, int threads);
 
@@ -49,6 +50,8 @@ void show_msg(void);
 int main(void) {
   int threads = 0;
 
+  // cada thread vai receber um par de endereços
+  // e um variável com seu id
   struct pair_addr *index_addr;
   pthread_t *threads_id;
 
@@ -61,7 +64,7 @@ int main(void) {
 
     show_msg();
 
-    printf("Informe uma opção: ");
+    printf("\nInforme uma opção: ");
     scanf("%d", &option);
 
     switch (option) {
@@ -82,10 +85,10 @@ int main(void) {
       break;
 
     case 2:
-      printf("Preenchendo a matriz!\n (Aguarde...)\n");
+      printf("\nPreenchendo a matriz!\n (Aguarde...)\n");
 
       if (fill_matrix(matrix_order[0], matrix_order[1]) == 0) {
-        puts("Matriz preenchida!");
+        puts("Matriz preenchida!\n");
       }
 
       break;
@@ -96,32 +99,32 @@ int main(void) {
 
       // TODO: tratar os retornos
       threads_id = (pthread_t *)malloc(threads * sizeof(pthread_t));
+      if(threads_id == NULL) {
+        fprintf(stderr, "Erro ao alocar o threads_id\n");
+        exit(-1);
+      }
+
       index_addr =
           (struct pair_addr *)malloc(threads * sizeof(struct pair_addr));
+      if(index_addr == NULL) {
+        fprintf(stderr, "Erro ao alocar o index_addr\n");
+        exit(-1);
+      }
 
       // separando os endereços e os indíces restantes, caso não for uma matriz
-      // quadrada fica para a última thread
+      // quadrada, os elementos restante ficam para a última thread
       data_share(matrix_order[0], matrix_order[1], threads, index_addr);
-
-      for (int i = 0; i <= (threads - 1); i++) {
-        printf("(%d - %d)\n", index_addr[i].initial_addr,
-               index_addr[i].last_addr);
-      }
 
       break;
 
     case 4:
       initial_time = clock();
 
-      for (int j = 0; j < threads; j++) {
-        printf("addr: %d - %d\n", index_addr[j].initial_addr,
-               index_addr[j].last_addr);
+      for (int j = 0; j < threads; j++)
         pthread_create(&threads_id[j], NULL, find_pnum, &index_addr[j]);
-      }
 
-      for (int k = 0; k < threads; k++) {
+      for (int k = 0; k < threads; k++)
         pthread_join(threads_id[k], NULL);
-      }
 
       initial_time = clock() - initial_time;
       total_time = (double)initial_time / CLOCKS_PER_SEC;
