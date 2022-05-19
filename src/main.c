@@ -15,6 +15,8 @@ int show_matrix(int rows, int cols);
 // pseudo-aleatórios
 int fill_matrix(int rows, int cols);
 
+int find_pnum(int initial_addr, int last_addr);
+
 void show_msg(void);
 
 int main(void) {
@@ -51,6 +53,19 @@ int main(void) {
       if (fill_matrix(matrix_order[0], matrix_order[1]) == 0) {
         puts("Matriz preenchida!");
       }
+
+      break;
+
+    case 3:
+      puts("[Não implementado]");
+
+      break;
+
+    case 4:
+      int pnum_total = 0;
+
+      pnum_total = find_pnum(matrix_order[0], matrix_order[1]);
+      printf("Total de Números Primos: %5d\n", pnum_total);
 
       break;
 
@@ -135,6 +150,34 @@ void show_msg(void) {
   char *msg_1 = "1 - Alocar matriz";
   char *msg_2 = "2 - Preencher matriz";
 
+  char *msg_4 = "4 - Executar";
+
   printf("%s\n", msg_1);
   printf("%s\n", msg_2);
+  printf("%s\n", msg_4);
+}
+
+int find_pnum(int initial_addr, int last_addr) {
+  // total de números primos encontrados
+  int pnum_found = 0;
+
+  for (int i = initial_addr; i < (initial_addr * last_addr); i++) {
+    int n_div = 0;
+    //
+    for (int j = 1; j <= (*matrix)[i]; j += 2) {
+
+      if ((*matrix)[i] % 2 == 0 || n_div > 2)
+        break;
+
+      if ((*matrix)[i] % j == 0)
+        n_div++;
+    }
+
+    if (n_div == 2) {
+      printf("(%10d) [%8d]\n", i, (*matrix)[i]);
+      pnum_found++;
+    }
+  }
+
+  return pnum_found;
 }
