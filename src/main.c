@@ -27,8 +27,13 @@ int main(int argc, char *argv[argc + 1]) {
 
   int matrix_order[2];
 
+  if(argc != 2) {
+    puts("Para fins de teste, informe a ordem da matriz");
+    return -1;
+  }
+
   matrix_order[0] = atoi(argv[1]);
-  matrix_order[1] = atoi(argv[2]);
+  matrix_order[1] = atoi(argv[1]);
 
   alloc_matrix(matrix_order[0], matrix_order[1]);
   fill_matrix(matrix_order[0], matrix_order[1]);
@@ -40,8 +45,7 @@ int main(int argc, char *argv[argc + 1]) {
   initial_time = clock() - initial_time;
   total_time = (double)initial_time / CLOCKS_PER_SEC;
 
-  printf("%5d x %5d - %8d - %10.4f\n", matrix_order[0], matrix_order[1],
-         pnum_total, total_time);
+  printf("[%8d] - [%5d] - [%10.4f]\n", pnum_total, matrix_order[0], total_time);
 
   free(matrix);
 
