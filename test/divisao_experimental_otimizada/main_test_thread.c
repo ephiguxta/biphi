@@ -3,7 +3,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <time.h>
-#include <math.h>
 
 #define MAX_SIZE 99999999
 
@@ -40,7 +39,7 @@ struct parse_data {
   char n_times;
 };
 // pega o número inteiro que pode dividir a matriz corretamente,
-// também o número restante, caso a matriz não for de ordem par 
+// também o número restante, caso a matriz não for de ordem par
 // esse dado restante será usado para a última thread operar sobre.
 struct parse_data slice_matrix(int rows, int cols, int threads);
 
@@ -48,108 +47,46 @@ void data_share(int rows, int cols, int threads, struct pair_addr *index_addr);
 
 void show_msg(void);
 
-int main(void) {
+int main(int argc, char *argv[argc + 1]) {
+  int matrix_order[2];
   int threads = 0;
+
+  matrix_order[0] = atoi(argv[1]);
+  matrix_order[1] = atoi(argv[1]);
+
+  threads = atoi(argv[2]);
 
   // cada thread vai receber um par de endereços
   // e um variável com seu id
   struct pair_addr *index_addr;
   pthread_t *threads_id;
 
-  clock_t initial_time;
-  double total_time;
+  alloc_matrix(matrix_order[0], matrix_order[1]);
+  fill_matrix(matrix_order[0], matrix_order[1]);
 
-  while (1) {
-    int option = 0;
-    int matrix_order[2];
-
-    show_msg();
-
-    printf("\nInforme uma opção: ");
-    scanf("%d", &option);
-
-    switch (option) {
-    case 1:
-      printf("Informe a ordem da matrix (NxM): \n");
-
-      printf("Linhas: ");
-      scanf("%d", &matrix_order[0]);
-
-      printf("Colunas: ");
-      scanf("%d", &matrix_order[1]);
-
-      if (alloc_matrix(matrix_order[0], matrix_order[1]) == 0) {
-        printf("\nMatriz %dx%d alocada com sucesso!\n", matrix_order[0],
-               matrix_order[1]);
-      }
-
-      break;
-
-    case 2:
-      printf("\nPreenchendo a matriz!\n (Aguarde...)\n");
-
-      if (fill_matrix(matrix_order[0], matrix_order[1]) == 0) {
-        puts("Matriz preenchida!\n");
-      }
-
-      break;
-
-    case 3:
-      printf("Informe o número de threads: ");
-      scanf("%d", &threads);
-
-      // TODO: tratar os retornos
-      threads_id = (pthread_t *)malloc(threads * sizeof(pthread_t));
-      if(threads_id == NULL) {
-        fprintf(stderr, "Erro ao alocar o threads_id\n");
-        exit(-1);
-      }
-
-      index_addr =
-          (struct pair_addr *)malloc(threads * sizeof(struct pair_addr));
-      if(index_addr == NULL) {
-        fprintf(stderr, "Erro ao alocar o index_addr\n");
-        exit(-1);
-      }
-
-      // separando os endereços e os indíces restantes, caso não for uma matriz
-      // quadrada, os elementos restante ficam para a última thread
-      data_share(matrix_order[0], matrix_order[1], threads, index_addr);
-
-      break;
-
-    case 4:
-      initial_time = clock();
-
-      for (int j = 0; j < threads; j++)
-        pthread_create(&threads_id[j], NULL, find_pnum, &index_addr[j]);
-
-      for (int k = 0; k < threads; k++)
-        pthread_join(threads_id[k], NULL);
-
-      initial_time = clock() - initial_time;
-      total_time = (double)initial_time / CLOCKS_PER_SEC;
-
-      break;
-
-    case 5:
-      printf("\nTempo de Execução: %.4f segundos\n", total_time);
-      printf("Total de Número Primos: %d\n\n", total_prime_n);
-
-      total_time = 0;
-      total_prime_n = 0;
-
-      break;
-
-    case 6:
-      puts("Encerrando o programa");
-      return 0;
-
-    default:
-      puts("Opção inexistente!");
-      exit(-1);
-    }
+  threads_id = (pthread_t *)malloc(threads * sizeof(pthread_t));
+  if (threads_id == NULL) {
+    fprintf(stderr, "Erro ao alocar o threads_id\n");
+    exit(-1);
   }
+
+  index_addr = (struct pair_addr *)malloc(threads * sizeof(struct pair_addr));
+  if (index_addr == NULL) {
+    fprintf(stderr, "Erro ao alocar o index_addr\n");
+    exit(-1);
+  }
+
+  // separando os endereços e os indíces restantes, caso não for uma matriz
+  // quadrada, os elementos restante ficam para a última thread
+  data_share(matrix_order[0], matrix_order[1], threads, index_addr);
+
+  for (int j = 0; j < threads; j++)
+    pthread_create(&threads_id[j], NULL, find_pnum, &index_addr[j]);
+
+  for (int k = 0; k < threads; k++)
+    pthread_join(threads_id[k], NULL);
+
+  printf("[%8d] - [%8d] - ", total_prime_n, matrix_order[0]);
 
   free(matrix);
 
@@ -193,17 +130,6 @@ int show_matrix(int rows, int cols) {
     }
   }
 
-  // por se tratar de um vetor também, podemos
-  // acessar essa matriz com apenas um laço de
-  // repetição
-  /*
-  for(int i = 0; i < (rows * cols); i++) {
-    printf("[%8d] ", (*matrix)[i]);
-    if((i + 1) % cols == 0)
-      puts("");
-  }
-  */
-
   return 0;
 }
 
@@ -223,10 +149,7 @@ int fill_matrix(int rows, int cols) {
 }
 
 void *find_pnum(void *data) {
-  // calcular os números primos até a raíz
-  // quadrada do MAX_SIZE, ja é o suficiente
   int limit = sqrt(MAX_SIZE);
-
   char is_prime = 0;
 
   struct pair_addr *index_addr = (struct pair_addr *)data;
@@ -236,8 +159,6 @@ void *find_pnum(void *data) {
     if ((*matrix)[i] % 2 == 0)
       continue;
 
-    // se passar pelos testes abaixo, não altera a
-    // variável e ele continua sendo 1 (ou "true")
     is_prime = 1;
 
     for (int j = 3; j <= limit; j += 2) {
@@ -287,6 +208,13 @@ void data_share(int rows, int cols, int threads, struct pair_addr *slice_addr) {
   }
 }
 
+/*
+struct parse_data {
+  int addr;
+  char remainder;
+  char n_times;
+};
+*/
 struct parse_data slice_matrix(int rows, int cols, int threads) {
   // quantas vezes vamos dividir a matriz, elementos restantes
   // e o multiplicador inteiro
@@ -313,20 +241,4 @@ struct parse_data slice_matrix(int rows, int cols, int threads) {
   slice_data.n_times = t_elements / slice_data.addr;
 
   return slice_data;
-}
-
-void show_msg(void) {
-  char *msg_1 = "1 - Alocar matriz";
-  char *msg_2 = "2 - Preencher matriz";
-  char *msg_3 = "3 - Definir o número de threads";
-  char *msg_4 = "4 - Executar";
-  char *msg_5 = "5 - Tempo de Execução e Total de Números Primos";
-  char *msg_6 = "6 - Encerrar";
-
-  printf("%s\n", msg_1);
-  printf("%s\n", msg_2);
-  printf("%s\n", msg_3);
-  printf("%s\n", msg_4);
-  printf("%s\n", msg_5);
-  printf("%s\n", msg_6);
 }
